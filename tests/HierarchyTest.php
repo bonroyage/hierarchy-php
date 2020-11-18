@@ -18,10 +18,12 @@ class HierarchyTest extends TestCase
             // These 3 form an endless loop, calling any 1 of these 3 should always return the other 2
             'loop1' => ['loop-relation' => ['loop2', 'loop3']],
             'loop2' => ['loop-relation' => ['loop3', 'loop1']],
-            'loop3' => ['loop-relation' => ['loop2']],
+            'loop3' => ['loop-relation' => ['loop1', 'loop2'], 'second-branch' => ['no-loop4']],
+            'no-loop4' => ['third-branch' => 'loop3', 'second-branch' => 'no-loop5'],
+            'no-loop5' => [],
         ];
 
-        $hierarchy = new Hierarchy($entries, ['ancestor', 'descendants', 'loop-relation']);
+        $hierarchy = new Hierarchy($entries, ['ancestor', 'descendants', 'loop-relation', 'second-branch', 'third-branch']);
         $this->assertInstanceOf(Hierarchy::class, $hierarchy);
 
         return $hierarchy;
@@ -111,7 +113,9 @@ class HierarchyTest extends TestCase
 
         $this->assertEqualsCanonicalizing(['loop1', 'loop2', 'loop3'], $hierarchy->relatedTo(['loop1']));
         $this->assertEqualsCanonicalizing(['loop1', 'loop2', 'loop3'], $hierarchy->relatedTo(['loop2']));
-        $this->assertEqualsCanonicalizing(['loop1', 'loop2', 'loop3'], $hierarchy->relatedTo(['loop3']));
+        $this->assertEqualsCanonicalizing(['loop1', 'loop2', 'loop3', 'no-loop4', 'no-loop5'], $hierarchy->relatedTo(['loop3']));
+        $this->assertEqualsCanonicalizing(['loop3', 'no-loop4', 'no-loop5'], $hierarchy->relatedTo(['no-loop4']));
+        $this->assertEqualsCanonicalizing(['no-loop5'], $hierarchy->relatedTo(['no-loop5']));
     }
 
 }

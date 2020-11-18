@@ -48,7 +48,7 @@ $hierarchy->relatedTo([2]); // [1, 2, 4]
 
 ### Infinite loops
 
-There's a safety built in to prevent infinite loops from occurring. Once an entity has been resolved before, it will resolve it again.
+There's a safety built in to prevent infinite loops from occurring. Once an entity has been resolved before, it will not resolve it again.
 
 ```php
 $hierarchy = new Vosburch\Hierarchy([
